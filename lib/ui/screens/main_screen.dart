@@ -16,6 +16,7 @@ class MainScreen extends StatefulWidget {
 class MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
+    String tmpStr = '';
     bool _isCopy = context.watch<PanelProvider>().isCopy;
     return Stack(
       children: [
@@ -111,6 +112,7 @@ class MainScreenState extends State<MainScreen> {
                     ),
                     onPressed: () {
                       context.read<PanelProvider>().setMove();
+                      context.read<PanelProvider>().moveFile();
                       // _createNewFolderDialog(context);
                     },
                   ),
@@ -139,7 +141,35 @@ class MainScreenState extends State<MainScreen> {
                       ],
                     ),
                     onPressed: () {
-                      // _createNewFolderDialog(context);
+                      context.read<PanelProvider>().unKey == 0
+                          ? tmpStr =
+                              'delete selected files from the  left panel'
+                          : tmpStr =
+                              'delete selected files from the right  panel';
+
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text(tmpStr),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Сancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  context.read<PanelProvider>().moveFile();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('DEL'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                 ),

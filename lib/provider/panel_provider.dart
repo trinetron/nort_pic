@@ -7,7 +7,6 @@ class PanelProvider extends ChangeNotifier {
   List<String> currentDirectory = ["/", "/"];
   int unKey = 0;
   bool isCopy = false;
-  bool isCopyNow = false;
   Set<String> selectedImages0 = Set();
   Set<String> selectedImages1 = Set();
 
@@ -32,17 +31,10 @@ class PanelProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setCopyNow() {
-    isCopyNow = true;
-
-    debugPrint('isCopyNow  $isCopyNow');
-    notifyListeners();
-  }
-
   void setUnKey(int val) {
     unKey = val;
 
-    debugPrint('isCopyNow  $isCopyNow');
+    debugPrint('unKey  $unKey');
     notifyListeners();
   }
 
@@ -83,34 +75,68 @@ class PanelProvider extends ChangeNotifier {
     }
 
     updatedDir();
+  }
 
-    // if (unKey == 0) {
-    //   selectedImages = selectedImages0;
-    // } else {
-    //   selectedImages = selectedImages1;
-    // }
+  void moveFile() {
+    Set<String> selectedImages = {};
+    String destinationDirectory = '';
 
-    // File sourceFile = File(sourcePath);
+    if (unKey == 0) {
+      destinationDirectory = currentDirectory[1];
+      selectedImages = selectedImages0;
+    } else {
+      destinationDirectory = currentDirectory[0];
+      selectedImages = selectedImages1;
+    }
 
-    // if (selectedImages.isNotEmpty) {
-    //   for (String imagePath in selectedImages) {
-    //     copyFile(imagePath, targetPath);
+    if (selectedImages.isNotEmpty) {
+      for (String filePath in selectedImages) {
+        File sourceFile = File(filePath);
 
-    //     if (sourceFile.existsSync()) {
-    //       File targetFile =
-    //           File(targetPath + '\\' + sourceFile.path.split('\\').last);
-    //       sourceFile.copySync(targetFile.path);
-    //     }
-    //   }
-    //   updatedDir();
-    // } else {
-    //   if (sourceFile.existsSync()) {
-    //     File targetFile =
-    //         File(targetPath + '\\' + sourceFile.path.split('\\').last);
-    //     sourceFile.copySync(targetFile.path);
-    //     updatedDir();
-    //   }
-    //   print('Список изображений пустой');
-    // }
+        if (sourceFile.existsSync()) {
+          File targetFile = File(
+              destinationDirectory + '\\' + sourceFile.path.split('\\').last);
+          sourceFile.copySync(targetFile.path);
+          sourceFile.deleteSync();
+        }
+      }
+    }
+    if (unKey == 0) {
+      selectedImages0.clear();
+    } else {
+      selectedImages1.clear();
+    }
+
+    updatedDir();
+  }
+
+  void delFile() {
+    Set<String> selectedImages = {};
+    String destinationDirectory = '';
+
+    if (unKey == 0) {
+      destinationDirectory = currentDirectory[1];
+      selectedImages = selectedImages0;
+    } else {
+      destinationDirectory = currentDirectory[0];
+      selectedImages = selectedImages1;
+    }
+
+    if (selectedImages.isNotEmpty) {
+      for (String filePath in selectedImages) {
+        File sourceFile = File(filePath);
+
+        if (sourceFile.existsSync()) {
+          sourceFile.deleteSync();
+        }
+      }
+    }
+    if (unKey == 0) {
+      selectedImages0.clear();
+    } else {
+      selectedImages1.clear();
+    }
+
+    updatedDir();
   }
 }
