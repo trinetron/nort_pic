@@ -10,7 +10,7 @@ class PermissionsService extends ChangeNotifier {
     bool isStorageOn = serviceStatus == ServiceStatus.enabled;
     debugPrint(isStorageOn.toString());
 
-    var status = await Permission.storage.request();
+    var status = await Permission.photos.request();
 
     if (status == PermissionStatus.granted) {
       debugPrint('Permission Granted');

@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:nort_pic/models/languages/translat_locale_keys.g.dart';
 import 'package:nort_pic/provider/panel_provider.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 class Panel extends StatefulWidget {
@@ -19,7 +20,9 @@ class _PanelState extends State<Panel> {
 
   void openFolder(String folderPath) {
     setState(() {
-      context.read<PanelProvider>().currentDirectory[widget.unkey] = folderPath;
+      context
+          .read<PanelProvider>()
+          .setCurrentDirectory(nomPanel: widget.unkey, fPath: folderPath);
       directoryStack.add(folderPath);
       context.read<PanelProvider>().updatedDir();
     });
@@ -29,8 +32,9 @@ class _PanelState extends State<Panel> {
     if (directoryStack.length > 1) {
       setState(() {
         directoryStack.removeLast();
-        context.read<PanelProvider>().currentDirectory[widget.unkey] =
-            directoryStack.last;
+        context.read<PanelProvider>().setCurrentDirectory(
+            nomPanel: widget.unkey, fPath: directoryStack.last);
+
         context.read<PanelProvider>().updatedDir();
       });
     }
@@ -89,6 +93,9 @@ class _PanelState extends State<Panel> {
 
   @override
   Widget build(BuildContext context) {
+    directoryStack = context.watch<PanelProvider>().startDirectory;
+    currentDirectory =
+        context.watch<PanelProvider>().currentDirectory[widget.unkey];
     List<String> subFolders = getSubFolders(
         context.watch<PanelProvider>().currentDirectory[widget.unkey]);
 
@@ -170,7 +177,6 @@ class _PanelState extends State<Panel> {
         ),
       );
     }
-    context.read<PanelProvider>().updatedDir();
   }
 }
 
@@ -377,8 +383,16 @@ class MediaGalleryState extends State<MediaGallery> {
       if (file is File &&
           (file.path.endsWith('.jpg') ||
               file.path.endsWith('.JPG') ||
+              file.path.endsWith('.JPEG') ||
+              file.path.endsWith('.PNG') ||
               file.path.endsWith('.png') ||
-              file.path.endsWith('.mp4'))) {
+              file.path.endsWith('.GIF') ||
+              file.path.endsWith('.gif') ||
+              file.path.endsWith('.BMP') ||
+              file.path.endsWith('.bmp') ||
+              file.path.endsWith('.WebP') ||
+              file.path.endsWith('.WBMP') ||
+              file.path.endsWith('.Jpg'))) {
         mediaFiles.add(file.path);
       }
     }

@@ -4,11 +4,20 @@ import 'package:flutter/material.dart';
 
 class PanelProvider extends ChangeNotifier {
   int flgUpdatedMg = 0;
-  List<String> currentDirectory = ["/", "/"];
+  List<String> currentDirectory = [];
+  List<String> startDirectory = [];
   int unKey = 0;
   bool isCopy = false;
   Set<String> selectedImages0 = Set();
   Set<String> selectedImages1 = Set();
+
+  void setPaths(List<String> startDirectoryTmp) {
+    startDirectory = startDirectoryTmp;
+    currentDirectory = startDirectoryTmp;
+
+    debugPrint('startDirectory  $startDirectory');
+    notifyListeners();
+  }
 
   void updatedMg0() {
     flgUpdatedMg = 0;
@@ -21,6 +30,17 @@ class PanelProvider extends ChangeNotifier {
     flgUpdatedMg++;
 
     debugPrint('currentDirectory  $currentDirectory');
+    notifyListeners();
+  }
+
+  void setCurrentDirectory({required int nomPanel, required String fPath}) {
+    if (nomPanel == 0) {
+      currentDirectory[0] = fPath;
+    } else {
+      currentDirectory[1] = fPath;
+    }
+
+    debugPrint('setCurrentDirectory  $currentDirectory');
     notifyListeners();
   }
 
