@@ -161,7 +161,7 @@ class MainScreenState extends State<MainScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  context.read<PanelProvider>().moveFile();
+                                  context.read<PanelProvider>().delFile();
                                   Navigator.of(context).pop();
                                 },
                                 child: Text('DEL'),

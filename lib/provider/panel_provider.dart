@@ -43,8 +43,9 @@ class PanelProvider extends ChangeNotifier {
       //directories.add("storage/emulated/0/");
       //directories.add((await getExternalStorageDirectory())!.path);
     } else if (Platform.isWindows) {
-      directories.add((await getApplicationDocumentsDirectory()).path);
-      directories.add((await getTemporaryDirectory()).path);
+      //directories.add("C:\\Users\\Filipok\\Downloads" as String);
+      // directories.add((await getApplicationDocumentsDirectory()).path);
+      // directories.add((await getTemporaryDirectory()).path);
       directories.add((await getDownloadsDirectory())!.path);
     } else if (Platform.isMacOS) {
       // directories.add((await getApplicationDocumentsDirectory()).path);

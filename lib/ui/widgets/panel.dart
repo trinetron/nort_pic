@@ -82,6 +82,17 @@ class _PanelState extends State<Panel> {
     }
   }
 
+  void delFile(String sourcePath, String targetPath) {
+    File sourceFile = File(sourcePath);
+    if (sourceFile.existsSync()) {
+      File targetFile = File(targetPath +
+          Platform.pathSeparator +
+          sourceFile.path.split(Platform.pathSeparator).last);
+      sourceFile.deleteSync();
+      context.read<PanelProvider>().updatedDir();
+    }
+  }
+
   void copyFile(String sourcePath, String targetPath) {
     File sourceFile = File(sourcePath);
     // Set<String> selectedImages = {};
@@ -489,7 +500,7 @@ class MediaGalleryState extends State<MediaGallery> {
                   ),
                   child: DisposableCachedImage.local(
                     imagePath: imagePath,
-                    resizeImage: true,
+                    //resizeImage: true,
                     fit: BoxFit.cover,
                   ),
                 ),
