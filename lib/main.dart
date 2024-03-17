@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:disposable_cached_images/disposable_cached_images.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:nort_pic/provider/panel_provider.dart';
@@ -21,13 +22,17 @@ void main() async {
   //await DefaultCacheManager().emptyCache();
   // await Hive.deleteBoxFromDisk('shopping_box');
 
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await DisposableImages.init(maximumDownload: 12);
+
   //   hive initialization
   await Hive.initFlutter();
   Hive.registerAdapter(ChiveAdapter());
 
   if ((Platform.isWindows) || (Platform.isIOS) || (Platform.isLinux)) {
     // windowManager initialization
-    WidgetsFlutterBinding.ensureInitialized();
+
     await windowManager.ensureInitialized();
 
     WindowOptions windowOptions = const WindowOptions(
@@ -49,18 +54,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  runApp(EasyLocalization(
-    supportedLocales: const [
-      Locale('en'),
-      Locale('ru'),
-      Locale('fr'),
-      Locale('es'),
-      Locale('zh'),
-    ],
-    path: 'lib/models/languages',
-    fallbackLocale: Locale('en'),
-    child: MultiProvider(
-      providers: [
+  runApp(DisposableImages(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('en'),
+        Locale('ru'),
+        Locale('fr'),
+        Locale('es'),
+        Locale('zh'),
+      ],
+      path: 'lib/models/languages',
+      fallbackLocale: Locale('en'),
+      child: MultiProvider(providers: [
         ChangeNotifierProvider<DatabaseProvider>(
           create: (_) => DatabaseProvider(),
         ),
@@ -76,8 +81,7 @@ void main() async {
         ChangeNotifierProvider<PanelProvider>(
           create: (context) => PanelProvider(),
         ),
-      ],
-      child: const NortPicApp(),
+      ], child: const NortPicApp()),
     ),
   ));
 }
@@ -103,29 +107,7 @@ class NortPicAppState extends State<NortPicApp> {
   void initState() {
     super.initState();
     context.read<PermissionsService>().requestStoragePermission();
-    initDirectories();
-  }
-
-  Future<void> initDirectories() async {
-    List<String> directories = [];
-
-    if (Platform.isIOS) {
-      directories.add((await getApplicationDocumentsDirectory()).path);
-      directories.add((await getTemporaryDirectory()).path);
-      directories.add((await getApplicationSupportDirectory()).path);
-    } else if (Platform.isAndroid) {
-      directories.add((await getApplicationDocumentsDirectory()).path);
-      directories.add((await getTemporaryDirectory()).path);
-      directories.add((await getExternalStorageDirectory())!.path);
-    } else if (Platform.isWindows) {
-      directories.add((await getApplicationDocumentsDirectory()).path);
-      directories.add((await getTemporaryDirectory()).path);
-      directories.add((await getDownloadsDirectory())!.path);
-    }
-
-    setState(() {
-      context.read<PanelProvider>().setPaths(directories);
-    });
+    context.read<PanelProvider>().initDirectories();
   }
 
   @override

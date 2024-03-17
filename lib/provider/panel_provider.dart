@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter_all_path_provider/flutter_all_path_provider.dart';
 
 class PanelProvider extends ChangeNotifier {
   int flgUpdatedMg = 0;
@@ -10,10 +13,56 @@ class PanelProvider extends ChangeNotifier {
   bool isCopy = false;
   Set<String> selectedImages0 = Set();
   Set<String> selectedImages1 = Set();
+  List<StorageInfo> _storageInfo = [];
+
+  Future<void> initPlatformState() async {
+    late List<StorageInfo> storageInfo;
+
+    storageInfo = await FlutterAllPathProvider.getStorageInfo();
+
+    _storageInfo = storageInfo;
+  }
+
+  Future<void> initDirectories() async {
+    if (Platform.isAndroid) await initPlatformState();
+    List<String> directories = [];
+    print("set dir");
+
+    if (Platform.isIOS) {
+      directories.add((await getApplicationDocumentsDirectory()).path);
+      //directories.add((await getTemporaryDirectory()).path);
+      //directories.add((await getApplicationSupportDirectory()).path);
+    } else if (Platform.isAndroid) {
+      //directories.add((await getApplicationDocumentsDirectory()).path);
+      //directories.add((await getTemporaryDirectory()).path);
+
+      directories.add(_storageInfo.isNotEmpty
+          ? _storageInfo[0].rootDir
+          : (await getTemporaryDirectory()).path);
+
+      //directories.add("storage/emulated/0/");
+      //directories.add((await getExternalStorageDirectory())!.path);
+    } else if (Platform.isWindows) {
+      directories.add((await getApplicationDocumentsDirectory()).path);
+      directories.add((await getTemporaryDirectory()).path);
+      directories.add((await getDownloadsDirectory())!.path);
+    } else if (Platform.isMacOS) {
+      // directories.add((await getApplicationDocumentsDirectory()).path);
+
+      directories.add((await getTemporaryDirectory()).path);
+      //directories.add((await getDownloadsDirectory())!.path);
+    }
+
+    setPaths(directories);
+    print("set dir2");
+    notifyListeners();
+  }
 
   void setPaths(List<String> startDirectoryTmp) {
     startDirectory = startDirectoryTmp;
-    currentDirectory = startDirectoryTmp;
+    //startDirectory = StorageDirectory.dcim;
+    currentDirectory.add(startDirectoryTmp[0]);
+    currentDirectory.add(startDirectoryTmp[0]);
 
     debugPrint('startDirectory  $startDirectory');
     notifyListeners();
@@ -82,8 +131,9 @@ class PanelProvider extends ChangeNotifier {
         File sourceFile = File(filePath);
 
         if (sourceFile.existsSync()) {
-          File targetFile = File(
-              destinationDirectory + '\\' + sourceFile.path.split('\\').last);
+          File targetFile = File(destinationDirectory +
+              Platform.pathSeparator +
+              sourceFile.path.split(Platform.pathSeparator).last);
           sourceFile.copySync(targetFile.path);
         }
       }
@@ -114,8 +164,9 @@ class PanelProvider extends ChangeNotifier {
         File sourceFile = File(filePath);
 
         if (sourceFile.existsSync()) {
-          File targetFile = File(
-              destinationDirectory + '\\' + sourceFile.path.split('\\').last);
+          File targetFile = File(destinationDirectory +
+              Platform.pathSeparator +
+              sourceFile.path.split(Platform.pathSeparator).last);
           sourceFile.copySync(targetFile.path);
           sourceFile.deleteSync();
         }

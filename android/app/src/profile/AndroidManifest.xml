@@ -4,7 +4,53 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
-     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    
+ <!-- Разрешение на доступ к файловой системе -->
+ <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+ <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+ <!-- Разрешение на доступ к камере -->
+ <uses-permission android:name="android.permission.CAMERA" />
+
+ <!-- Разрешение на доступ к микрофону -->
+ <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+ <!-- Разрешение на доступ к местоположению -->
+ <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+ <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+ <!-- Разрешение на доступ к уведомлениям -->
+ <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+ <!-- Разрешение на выполнение звонков -->
+ <uses-permission android:name="android.permission.CALL_PHONE" />
+
+ <!-- Разрешение на отправку SMS -->
+ <uses-permission android:name="android.permission.SEND_SMS" />
+
+ <!-- Разрешение на чтение контактов -->
+ <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+ <!-- Разрешение на изменение контактов -->
+ <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+ <!-- Разрешение на чтение календаря -->
+ <uses-permission android:name="android.permission.READ_CALENDAR" />
+
+ <!-- Разрешение на изменение календаря -->
+ <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+
+ <!-- Разрешение на использование биометрии -->
+ <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+ <!-- Разрешение на получение привилегированных API -->
+ <uses-permission android:name="android.permission.ACCESS_PRIVILEGED_API" />
+
+ <!-- Разрешение на управление энергосбережением -->
+ <uses-permission android:name="android.permission.CONTROL_POWER_STATE" />
+
+ <!-- Разрешение на использование повышенного приоритета -->
+ <uses-permission android:name="android.permission.HIGH_PRIORITY_APP" />
 
 
 </manifest>

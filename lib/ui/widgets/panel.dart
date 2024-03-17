@@ -4,8 +4,10 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:nort_pic/models/languages/translat_locale_keys.g.dart';
 import 'package:nort_pic/provider/panel_provider.dart';
+import 'package:nort_pic/provider/permissions_provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:disposable_cached_images/disposable_cached_images.dart';
 
 class Panel extends StatefulWidget {
   int unkey;
@@ -15,8 +17,8 @@ class Panel extends StatefulWidget {
 }
 
 class _PanelState extends State<Panel> {
-  List<String> directoryStack = ["/"];
-  String currentDirectory = "/";
+  late List<String> directoryStack;
+  late String currentDirectory;
 
   void openFolder(String folderPath) {
     setState(() {
@@ -71,8 +73,9 @@ class _PanelState extends State<Panel> {
   void moveFile(String sourcePath, String targetPath) {
     File sourceFile = File(sourcePath);
     if (sourceFile.existsSync()) {
-      File targetFile =
-          File(targetPath + '\\' + sourceFile.path.split('\\').last);
+      File targetFile = File(targetPath +
+          Platform.pathSeparator +
+          sourceFile.path.split(Platform.pathSeparator).last);
       sourceFile.copySync(targetFile.path);
       sourceFile.deleteSync();
       context.read<PanelProvider>().updatedDir();
@@ -84,8 +87,9 @@ class _PanelState extends State<Panel> {
     // Set<String> selectedImages = {};
 
     if (sourceFile.existsSync()) {
-      File targetFile =
-          File(targetPath + '\\' + sourceFile.path.split('\\').last);
+      File targetFile = File(targetPath +
+          Platform.pathSeparator +
+          sourceFile.path.split(Platform.pathSeparator).last);
       sourceFile.copySync(targetFile.path);
       context.read<PanelProvider>().updatedDir();
     }
@@ -207,7 +211,8 @@ class _FileExplorerState extends State<FileExplorer> {
   void crtNewFld(String nmFld) {
     String folderName = nmFld;
     // Здесь логика создания новой папки
-    String newPath = widget.currentDirectory + '/$folderName';
+    String newPath =
+        widget.currentDirectory + Platform.pathSeparator + '$folderName';
 
     Directory newDirectory = Directory(newPath);
     newDirectory.createSync(recursive: true); // Создаем новую папку
@@ -436,58 +441,61 @@ class MediaGalleryState extends State<MediaGallery> {
     return Container(
       color: Color.fromARGB(255, 2, 13, 167),
       child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: GridView.builder(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 4.0,
-            mainAxisSpacing: 4.0,
-          ),
-          itemCount: mediaFiles.length,
-          itemBuilder: (context, index) {
-            String imagePath = mediaFiles[index];
-            return GestureDetector(
-              onTap: () {
-                toggleImageSelection(imagePath);
-                context.read<PanelProvider>().setUnKey(widget.uniqueKey);
-              },
-              onLongPress: () {
-                toggleImage(mediaFiles[index]);
-              },
-              onDoubleTap: () {
-                final String dir0 =
-                    context.read<PanelProvider>().currentDirectory[0];
-                final String dir1 =
-                    context.read<PanelProvider>().currentDirectory[1];
+          padding: const EdgeInsets.all(3.0),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              crossAxisSpacing: 0.0,
+              mainAxisSpacing: 0.0,
+            ),
+            itemCount: mediaFiles.length,
+            itemBuilder: (context, index) {
+              String imagePath = mediaFiles[index];
+              return GestureDetector(
+                onTap: () {
+                  toggleImageSelection(imagePath);
+                  context.read<PanelProvider>().setUnKey(widget.uniqueKey);
+                },
+                onLongPress: () {
+                  toggleImage(mediaFiles[index]);
+                },
+                onDoubleTap: () {
+                  final String dir0 =
+                      context.read<PanelProvider>().currentDirectory[0];
+                  final String dir1 =
+                      context.read<PanelProvider>().currentDirectory[1];
 
-                if (dir0 != dir1) {
-                  if (widget.uniqueKey == 0) {
-                    context.read<PanelProvider>().isCopy
-                        ? widget.copyFile(mediaFiles[index], dir1)
-                        : widget.moveFile(mediaFiles[index], dir1);
-                  } else {
-                    context.read<PanelProvider>().isCopy
-                        ? widget.copyFile(mediaFiles[index], dir0)
-                        : widget.moveFile(mediaFiles[index], dir0);
+                  if (dir0 != dir1) {
+                    if (widget.uniqueKey == 0) {
+                      context.read<PanelProvider>().isCopy
+                          ? widget.copyFile(mediaFiles[index], dir1)
+                          : widget.moveFile(mediaFiles[index], dir1);
+                    } else {
+                      context.read<PanelProvider>().isCopy
+                          ? widget.copyFile(mediaFiles[index], dir0)
+                          : widget.moveFile(mediaFiles[index], dir0);
+                    }
+                    context.read<PanelProvider>().updatedDir();
                   }
-                  context.read<PanelProvider>().updatedDir();
-                }
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: isImageSelected(imagePath)
-                        ? Colors.red
-                        : Colors.transparent,
-                    width: 4.0,
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: isImageSelected(imagePath)
+                          ? Colors.red
+                          : Colors.transparent,
+                      width: 4.0,
+                    ),
+                  ),
+                  child: DisposableCachedImage.local(
+                    imagePath: imagePath,
+                    resizeImage: true,
+                    fit: BoxFit.cover,
                   ),
                 ),
-                child: Image.file(File(mediaFiles[index]), fit: BoxFit.cover),
-              ),
-            );
-          },
-        ),
-      ),
+              );
+            },
+          )),
     );
   }
 }
